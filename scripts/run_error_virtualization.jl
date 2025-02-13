@@ -1,6 +1,5 @@
 # Script that receives the parameters and run the `main()` function which processes and save the results
-using DrWatson
-@quickactivate :ErrorVirtualization
+using SequentialMeasurements
 
 ctrl_params_dict = Dict(
     :n => 0, #1,        # CDD order
@@ -20,7 +19,9 @@ noise_params_dict = Dict(
 )
 
 save_output = false #true
-data_collection = datadir("sims", "local", "periodic_control", "lf_noise")
+# data_collection = datadir("sims", "local", "periodic_control", "lf_noise")
+data_collection = @__DIR__
+# TODO: if the data_collection is not specified, this should be the default path
 
 num_realizations = Int(1e1) # 2e3
 
