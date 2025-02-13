@@ -1,18 +1,10 @@
 module ControlledEvolution
 
 using QuantumOpticsBase, QuantumOptics, StaticArrays, LinearAlgebra, Distributions, Random
+using ..CoreTypes
 
 export cdd, cdd_filter_function, reset_qubit, cdd_final_state, cdd_time_evolution, periodic_control_final_state, 
-periodic_control_time_evolution, gate_fidelity, periodic_control, periodic_control_conditional, CDDParams
-
-
-@kwdef struct CDDParams
-    n::Int64         # order of CDD
-    t0::Float64      # initial time
-    τg::Float64      # gate time
-    nsteps::Int64    # number of steps for the free-evolution regions. Total number of steps = 2^n * nsteps
-    M_max::Int64     # maximum number of repetitions of dynamical decoupling sequences 
-end
+periodic_control_time_evolution, gate_fidelity, periodic_control, periodic_control_conditional
 
 
 """
@@ -385,4 +377,4 @@ function periodic_control_conditional(
 end
 
 
-end # module
+end # module ControlledEvolution

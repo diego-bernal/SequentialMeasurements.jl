@@ -1,20 +1,10 @@
 module SpectralRepresentation
 
 using FFTW, SpecialFunctions, Interpolations
+using ..CoreTypes
 
 export spectral_representation, interpolate_noise, noise_generation_loop, group_array,
-    periodogram, fourier_transform, lorentzian, lf_gaussian, hf_gaussian, lorentzian_article,
-    NoiseParams
-
-
-@kwdef struct NoiseParams
-    Nb::Int64                         # number of bath qubits
-    psd_function::Function            # spectral density function
-    psd_kwargs::Dict{Symbol, Any}
-    ωu::Float64                       # upper cutoff sampling frequency
-    Nh::Int64                         # number of harmonics to sample
-end
-
+    periodogram, fourier_transform, lorentzian, lf_gaussian, hf_gaussian, lorentzian_article
 
 function lorentzian_article(omega; P0=1.0, omega_c=200.0)
     return (P0 / (π * omega_c)) / (1 + (omega/omega_c)^2)
