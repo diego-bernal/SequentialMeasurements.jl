@@ -1,9 +1,9 @@
 module ControlledEvolution
 
-using QuantumOpticsBase, QuantumOptics, StaticArrays, LinearAlgebra, Distributions
+using QuantumOpticsBase, QuantumOptics, StaticArrays, LinearAlgebra, Distributions, Random
 
 export cdd, cdd_filter_function, reset_qubit, cdd_final_state, cdd_time_evolution, periodic_control_final_state, 
-periodic_control_time_evolution, gate_fidelity, periodic_control, CDDParams
+periodic_control_time_evolution, gate_fidelity, periodic_control, periodic_control_conditional, CDDParams
 
 
 @kwdef struct CDDParams
@@ -284,6 +284,104 @@ function gate_fidelity(ρsb, ρ_target)
     Nb = Int(log2(size(ρsb)[1])-1)
     ρs = ptrace(ρsb, 2:(Nb+1))
     return real(tr(ρs * ρ_target))
+end
+
+
+"""
+    periodic_control_conditional(M_max, n, t0, τg, nsteps, rho0, rho_reset, H, G, measurement_basis)
+
+This function implements periodic control with conditional evolution based on measurement outcomes.
+
+# Arguments
+- `M_max::Int64`: The maximum number of control cycles
+- `n::Int64`: The number of qubits in the system
+- `t0::Float64`: The initial time
+- `τg::Float64`: The duration of each control cycle
+- `nsteps::Int64`: The number of time steps in each control cycle
+- `rho0::Operator`: The initial density operator of the system
+- `rho_reset::Operator`: The reset state for the system part after each measurement
+- `H::TimeDependentSum`: The time-dependent Hamiltonian of the system
+- `G::Union{SVector,Vector}`: Fundamental control pulses
+- `measurement_basis::Operator`: The operator defining the measurement basis (in system space)
+
+# Returns
+- `expectation_values`: Array of expectation values ⟨σⱼ⟩ after each cycle
+- `measurement_outcomes`: Array of measurement outcomes (0 or 1) for each cycle
+"""
+function periodic_control_conditional(
+    M_max::Int64,
+    n::Int64,
+    t0::Float64,
+    τg::Float64,
+    nsteps::Int64,
+    rho0::Operator,
+    rho_reset::Operator,
+    H::TimeDependentSum,
+    G::Union{SVector,Vector},
+    measurement_basis::Operator
+    )
+    
+    # Initialize arrays to store results
+    expectation_values = Float64[]
+    measurement_outcomes = Int64[]
+    
+    # Current state
+    current_state = rho0
+    
+    # Get system dimensions to construct projectors
+    b_sys = basis(measurement_basis)
+    Id_sys = one(b_sys)
+    
+    # If there's a bath, get its dimension and identity
+    has_bath = size(current_state)[1] > size(measurement_basis)[1]
+    if has_bath
+        b_bath = tensor([SpinBasis(1//2) for _ in 1:Int(log2(size(current_state)[1])/2-1)]...)
+        Id_bath = one(b_bath)
+    end
+    
+    for m in 1:M_max
+        # Evolve state through CDD sequence
+        current_state = cdd_final_state(n, t0+(m-1)*τg, τg, nsteps, current_state, H, G)
+        
+        # Calculate expectation value in measurement basis
+        if has_bath
+            # Partial trace over bath to get system state for expectation value
+            rho_sys = ptrace(current_state, 2:Int(log2(size(current_state)[1])/2))
+        else
+            rho_sys = current_state
+        end
+        
+        expect_val = real(tr(measurement_basis * rho_sys))
+        push!(expectation_values, expect_val)
+        
+        # Calculate measurement probability (P(0) = 1/2(1 + ⟨σⱼ⟩))
+        prob_zero = 0.5 * (1 + expect_val)
+        
+        # Generate random measurement outcome
+        outcome = rand() < prob_zero ? 0 : 1
+        push!(measurement_outcomes, outcome)
+        
+        if has_bath
+            # Construct appropriate projector based on outcome
+            proj_sys = 0.5 * (Id_sys + (outcome == 0 ? 1 : -1) * measurement_basis)
+            projector = proj_sys ⊗ Id_bath
+            
+            # Apply projection and normalize
+            current_state = projector * current_state * dagger(projector)
+            normalize!(current_state)
+            
+            # Get bath state after measurement
+            rho_bath = ptrace(current_state, 1)
+            
+            # Prepare next state as tensor product of reset system state and current bath state
+            current_state = rho_reset ⊗ rho_bath
+        else
+            # For no bath case, just reset the state
+            current_state = rho_reset
+        end
+    end
+    
+    return expectation_values, measurement_outcomes
 end
 
 
