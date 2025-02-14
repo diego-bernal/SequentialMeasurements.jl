@@ -50,7 +50,7 @@ noise_params = Dict(
 
 # Initialize control and measurement scheme
 control = initialize_ctrl(:cdd, ctrl_params)
-measurement_scheme = error_virtualization_measurement()
+measurement_scheme::MeasurementScheme = FidelityWithPlus()  # Type-safe measurement scheme
 
 # Run simulation
 results = run_simulation(
@@ -59,9 +59,19 @@ results = run_simulation(
     control,
     "output_directory",    # data collection path
     measurement_scheme,
-    realization           # realization function
+    realization_function   # realization function specific to your protocol
 )
 ```
+
+### Available Measurement Schemes
+
+The package provides several measurement schemes:
+
+- `FidelityWithPlus()`: Measures fidelity with respect to the plus state (|+⟩)
+- `FidelityMeasurement(target_state)`: Measures fidelity with respect to any target state
+- `ExpectationMeasurement(operator)`: Measures expectation value of an operator
+
+You can also use `initialize_basic_measurements()` to get common measurement operators (σx, σy, σz).
 
 ## Contributing
 
