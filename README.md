@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/diego-bernal/SequentialMeasurements.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/diego-bernal/SequentialMeasurements.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/diego-bernal/SequentialMeasurements.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/diego-bernal/SequentialMeasurements.jl)
 
-A Julia package for simulating quantum systems under sequential measurements with dynamical decoupling control, particularly focusing on quantum error virtualization protocols.
+A Julia package for simulating noisy quantum systems under sequential measurements with dynamical decoupling control. The package builds upon [QuantumOptics.jl](https://qojulia.org/) for time-dependent quantum evolution and operator manipulation.
 
 ## Features
 
@@ -13,6 +13,12 @@ A Julia package for simulating quantum systems under sequential measurements wit
 - Flexible measurement schemes (fidelity measurements, expectation values)
 - Parallel execution support for multiple realizations
 - Data management and persistence capabilities
+
+## Dependencies
+
+The package primarily depends on:
+- [QuantumOptics.jl](https://qojulia.org/): Provides the core functionality for quantum operations and time-dependent evolution
+- Other standard Julia packages for numerical computations and data handling
 
 ## Installation
 
