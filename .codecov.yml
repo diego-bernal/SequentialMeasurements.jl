@@ -1,0 +1,37 @@
+# Exclude certain files/directories from coverage reports
+ignore:
+  - docs/
+  - scripts/
+  - test/
+
+coverage:
+  status:
+    project:
+      default:
+        target: 80%    # Require at least 80% test coverage
+        threshold: 5%  # Allow a 5% drop before failing CI
+    patch:
+      default:
+        target: 70%    # Require at least 70% coverage for new code patches
+        threshold: 5%  # Allow some flexibility in patch coverage
+
+comment:
+  layout: "header, diff, files"   # Show an overview + diff + per-file stats
+  require_changes: true  # Only post a comment if coverage actually changes
+  hide_project_coverage: false  # Show overall project coverage
+
+# Control how coverage is reported
+coverage:
+  range: "50...100"  # Treat coverage between 50% and 100% as acceptable
+
+# Set up branch-specific behavior
+ignore:
+  - "test/"          # Exclude test files from coverage calculation
+  - "benchmark/"     # Exclude benchmarks (if applicable)
+
+# Ensure Codecov runs mainly on `main` and pull requests
+flags:
+  main:
+    paths:
+      - "src/"
+    carryforward: true
