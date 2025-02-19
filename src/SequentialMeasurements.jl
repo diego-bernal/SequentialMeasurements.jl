@@ -2,25 +2,26 @@ module SequentialMeasurements
 
 using Reexport
 
-# Load core types and modules
+# Load core types and modules in dependency order
+include("OutputProcessing.jl")  # OutputProcessing is now independent
 include("CoreTypes.jl")
-include("MeasurementSchemes.jl")
-include("Initialization.jl")
-include("ParamDataBridge2.jl")
-include("SpectralRepresentation.jl")
-include("ControlledEvolution.jl")
 include("BathOperators.jl")
+include("ControlledEvolution.jl")
+include("SpectralRepresentation.jl")
+include("ParamDataBridge2.jl")
+include("Initialization.jl")
 include("SimulationExecution.jl")
 
+# Re-export all modules
+@reexport using .OutputProcessing
 @reexport using .CoreTypes
-@reexport using .MeasurementSchemes
-@reexport using .Initialization
-@reexport using .ParamDataBridge2
-@reexport using .SpectralRepresentation
-@reexport using .ControlledEvolution
 @reexport using .BathOperators
+@reexport using .ControlledEvolution
+@reexport using .SpectralRepresentation
+@reexport using .ParamDataBridge2
+@reexport using .Initialization
 @reexport using .SimulationExecution
 
-export initialize_noise, initialize_ctrl, run_simulation
+export initialize_noise, initialize_ctrl, initialize_measurement_scheme, run_simulation
 
 end # module SequentialMeasurements

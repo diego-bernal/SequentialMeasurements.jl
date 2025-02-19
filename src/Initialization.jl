@@ -5,7 +5,7 @@ using QuantumOptics
 using Distributions
 using ..BathOperators
 
-export initialize_ctrl, initialize_noise, initialize_simulation, init_params, init_operators
+export initialize_ctrl, initialize_noise, initialize_measurement_scheme, initialize_simulation, init_params, init_operators
 
 function init_operators(Nb)
     b_qubit = SpinBasis(1 // 2)
@@ -92,6 +92,20 @@ function initialize_noise(
         error("Unknown simulation type: $noise_type")
     end
 end
+
+
+function initialize_measurement_scheme(ms_dict::Dict)
+    b_qubit = SpinBasis(1//2)
+    # Always use sigma_x as measurement basis
+    sigma_x = sigmax(b_qubit)
+    
+    return MeasurementScheme(
+        fout = get(ms_dict, :fout, nothing),
+        conditional_evolution = get(ms_dict, :conditional_evolution, false),
+        measurement_basis = sigma_x  # Always use sigma_x regardless of what's in the dict
+    )
+end
+
 
 function initialize_simulation(noise_params::NoiseParams)
     (; Nb, psd_function, psd_kwargs) = noise_params
