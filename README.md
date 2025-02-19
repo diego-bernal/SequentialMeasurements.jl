@@ -31,7 +31,7 @@ Here's a basic example of running an error virtualization simulation:
 using SequentialMeasurements
 
 # Define control parameters
-ctrl_params = Dict(
+ctrl_params_dict = Dict(
     :n => 0,           # CDD order
     :t0 => 0.0,       # initial time
     :τg => 1.0,       # gate duration
@@ -40,38 +40,58 @@ ctrl_params = Dict(
 )
 
 # Define noise parameters
-noise_params = Dict(
-    :Nb => 2,                             # number of bath qubits
+noise_params_dict = Dict(
+    :Nb => 0,                             # number of bath qubits (0 for classical noise)
     :psd_function => lf_gaussian,         # spectral density function
     :psd_kwargs => Dict(:s => 1.0, :Δ0 => 50, :Γ0 => 0.1),
     :ωu => 2π*1.0,                       # upper frequency cutoff
     :Nh => Int(2.0^12)                   # number of harmonics
 )
 
-# Initialize control and measurement scheme
-control = initialize_ctrl(:cdd, ctrl_params)
-measurement_scheme::MeasurementScheme = FidelityWithPlus()  # Type-safe measurement scheme
+# Define measurement scheme
+measurement_scheme_dict = Dict(
+    :fout => process_fidelity_with_plus,  # measurement processing function
+    :conditional_evolution => false        # whether to use conditional evolution
+)
+
+# Initialize components
+control = initialize_ctrl(:cdd, ctrl_params_dict)
+noise = initialize_noise(:lf_gaussian, noise_params_dict)
+measurement_scheme = initialize_measurement_scheme(measurement_scheme_dict)
 
 # Run simulation
 results = run_simulation(
-    1000,                  # number of realizations
-    initialize_noise(:lf_gaussian, noise_params),
+    1000,                                 # number of realizations
+    noise,
     control,
-    "output_directory",    # data collection path
+    "output_directory",                   # data collection path
     measurement_scheme,
-    realization_function   # realization function specific to your protocol
+    error_virtualization_realization;     # realization function 
+    save_output=false                     # whether to save results to disk
 )
 ```
 
-### Available Measurement Schemes
+### Available Measurement Options
 
-The package provides several measurement schemes:
+The package provides several measurement processing functions:
 
-- `FidelityWithPlus()`: Measures fidelity with respect to the plus state (|+⟩)
-- `FidelityMeasurement(target_state)`: Measures fidelity with respect to any target state
-- `ExpectationMeasurement(operator)`: Measures expectation value of an operator
+- `process_fidelity_with_plus`: Measures fidelity with respect to the |+⟩ state
+- `process_fidelity`: Generic fidelity measurement with respect to any target state
+- `process_expectation`: Measures expectation value of an operator
 
-You can also use `initialize_basic_measurements()` to get common measurement operators (σx, σy, σz).
+Measurements can be performed in two modes:
+- Unconditional evolution (`conditional_evolution = false`): Average over all possible measurement outcomes
+- Conditional evolution (`conditional_evolution = true`): Perform measurements and update states based on outcomes
+
+### Noise Models
+
+The package includes several built-in spectral density functions:
+- `lf_gaussian`: Low-frequency Gaussian noise
+- `hf_gaussian`: High-frequency Gaussian noise
+- `lorentzian`: Lorentzian spectral density
+- `lorentzian_article`: Alternative Lorentzian parameterization
+
+You can also implement custom spectral density functions for specific noise models.
 
 ## Contributing
 
