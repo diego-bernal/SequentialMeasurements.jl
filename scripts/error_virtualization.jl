@@ -18,7 +18,7 @@ function error_virtualization_realization(
     (; Ω, g, γs, γb, rhoq, rhob, sx, sy, sz, X, Y, Z) = params_operators
     (; n, t0, τg, nsteps, M_max) = control_params
 
-    noise_operator_params = NoiseOperatorParams(Ω, g, γs, γb, X, Y, ξs_t, ξb_t)
+    noise_operator_params = NoiseOperatorParams(Ω, g, γs, γb, X, Y, Z, ξs_t, ξb_t)
     H = construct_hamiltonian(sz, noise_operator_params)
 
     # If no bath qubits, just evolve the system qubit
