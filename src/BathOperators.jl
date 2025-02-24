@@ -13,6 +13,7 @@ struct NoiseOperatorParams
     γb::Float64     
     X::Vector{Operator}
     Y::Vector{Operator}
+    Z::Vector{Operator}
     ξs_t::Function              
     ξb_t::Vector{Function} 
 end
@@ -44,6 +45,8 @@ function createNoiseOperator(params::NoiseOperatorParams)
 end
 
 
+# TODO: the current implementation is too specific to pure dephasing noise, 
+# it should be more general
 function construct_hamiltonian(sz::Operator, params::NoiseOperatorParams)
 
     # Nb = 0 case
