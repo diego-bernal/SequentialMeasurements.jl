@@ -238,10 +238,11 @@ function periodic_control_unconditional(
 
     final_states = Vector{Operator}(undef, M_max+1)
     current_state = rho0
-    
-    for m in 0:M_max
-        final_states[m+1] = current_state
+    final_states[1] = current_state
+
+    for m in 1:M_max
         current_state = cdd_final_state(n, t0+m*τg, τg, nsteps, current_state, H, G)
+        final_states[m+1] = current_state
         current_state = reset_qubit(current_state, rho_reset)
     end
 
@@ -294,6 +295,7 @@ function periodic_control_conditional(
     for m in 1:M_max
         # Evolve state through CDD sequence
         current_state = cdd_final_state(n, t0+(m-1)*τg, τg, nsteps, current_state, H, G)
+        states[m+1] = current_state
         
         # Calculate expectation value in measurement basis
         if has_bath
@@ -319,7 +321,7 @@ function periodic_control_conditional(
         else
             current_state = rho_reset
         end
-        states[m+1] = current_state
+        
     end
     
     if fout === nothing
