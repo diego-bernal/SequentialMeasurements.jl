@@ -5,7 +5,7 @@ using Logging
 using Statistics: mean
 using OrderedCollections
 using ..CoreTypes
-using ..OutputProcessing
+using ..MeasurementAnalysis
 using ..Initialization
 using ..ParamDataBridge2
 using ..BathOperators

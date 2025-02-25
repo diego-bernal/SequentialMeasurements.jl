@@ -1,4 +1,4 @@
-module OutputProcessing
+module MeasurementAnalysis
 
 using QuantumOptics
 
@@ -45,4 +45,4 @@ function process_fidelity_with_plus(states)
     return process_fidelity(states, target)
 end
 
-end # module OutputProcessing
+end # module MeasurementAnalysis

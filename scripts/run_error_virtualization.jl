@@ -1,7 +1,8 @@
-# Script that receives the parameters and runs the error virtualization protocol
+# Script that runs the error virtualization protocol simulation
 using QuantumOptics
-using SequentialMeasurements  # This already includes ParamDataBridge2
-include("error_virtualization.jl")
+using SequentialMeasurements
+using .SpectralRepresentation: lf_gaussian
+using .MeasurementAnalysis: process_fidelity_with_plus
 
 ctrl_params_dict = Dict(
     :n => 0,           # CDD order
@@ -20,12 +21,11 @@ noise_params_dict = Dict(
 )
 
 measurement_scheme_dict = Dict(
-    :fout => process_fidelity_with_plus,
+    :fout => process_fidelity_with_plus,  # From MeasurementAnalysis module
     :conditional_evolution => false
 )
 
 num_realizations = Int(1e1)
-
 save_output = false
 data_collection = @__DIR__
 
@@ -42,7 +42,7 @@ function main()
             control, 
             data_collection,
             measurement_scheme,
-            error_virtualization_realization;
+            pure_dephasing_evolution;  # Using the generalized protocol directly
             save_output=save_output
         ) 
     end

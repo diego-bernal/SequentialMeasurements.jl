@@ -46,7 +46,8 @@ end
 
 
 # TODO: the current implementation is too specific to pure dephasing noise, 
-# it should be more general
+# it should be more general. It also should be possible to give as an optional 
+# argument to work on the interaction picture or not.
 function construct_hamiltonian(sz::Operator, params::NoiseOperatorParams)
 
     # Nb = 0 case

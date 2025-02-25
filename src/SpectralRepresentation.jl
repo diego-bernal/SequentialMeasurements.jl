@@ -6,6 +6,7 @@ using ..CoreTypes
 export spectral_representation, interpolate_noise, noise_generation_loop, group_array,
     periodogram, fourier_transform, lorentzian, lf_gaussian, hf_gaussian, lorentzian_article
 
+    
 function lorentzian_article(omega; P0=1.0, omega_c=200.0)
     return (P0 / (π * omega_c)) / (1 + (omega/omega_c)^2)
 end
