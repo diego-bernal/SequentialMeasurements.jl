@@ -164,6 +164,7 @@ function run_simulation(
     if save_output
         params_dict = create_params_dict(num_realizations, params_operators, noise_params, ctrl_params)
         save_dataset(data_collection, params_dict, final_results) 
+        return nothing
     end
 
     return final_results
