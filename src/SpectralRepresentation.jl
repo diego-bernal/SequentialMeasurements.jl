@@ -1,6 +1,6 @@
 module SpectralRepresentation
 
-using FFTW, SpecialFunctions, Interpolations
+using FFTW, SpecialFunctions, Interpolations, Random
 using ..CoreTypes
 
 export spectral_representation, interpolate_noise, noise_generation_loop, group_array,

@@ -1,7 +1,7 @@
 module ParamDataBridge2
 
 
-using Dates, JLD2, DrWatson, DataFrames, OrderedCollections
+using Dates, FileIO, JLD2, DrWatson, DataFrames, OrderedCollections
 
 
 export dict_list_extended, save_dataset, load_dataset, sync_data!, delete_dataset!, delete_data_collection!

@@ -1,6 +1,7 @@
 module SimulationExecution
 
 using Base.Threads
+using Base: time
 using Logging
 using Statistics: mean
 using OrderedCollections
