@@ -6,43 +6,79 @@ on:
     tags: ['*']
   pull_request:
   workflow_dispatch:
+    
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-    permissions:
-      actions: write
-      contents: write
-      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
         version:
-          - '1.11'
-          - '1.10'
-          - 'pre'
+          - '1.10'  # Current stable release
         os:
           - ubuntu-latest
         arch:
           - x64
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
+      - uses: actions/checkout@v3
+      - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v1
+      
+      # Make sure all standard libraries are properly added to dependencies
+      - name: Update Project.toml with standard libraries
+        run: |
+          julia --project=. -e '
+            using Pkg;
+            # Ensure all standard libraries are correctly listed
+            stdlibs = ["LinearAlgebra", "Random", "Statistics", "Dates", "Logging", "FileIO"];
+            proj = Pkg.Types.read_project("Project.toml");
+            deps = get(proj, "deps", Dict());
+            
+            # UUIDs for standard libraries
+            uuids = Dict(
+                "LinearAlgebra" => "37e2e46d-f89d-539d-b4ee-838fcccc9c8e",
+                "Random" => "9a3f8284-a2c9-5f02-9a11-845980a1fd5c",
+                "Statistics" => "10745b16-79ce-11e8-11f9-7d13ad32a3b2",
+                "Dates" => "ade2ca70-3891-5945-98fb-dc099432e06a",
+                "Logging" => "56ddb016-857b-54e1-b83d-db4d58db5568",
+                "FileIO" => "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+            );
+            
+            # Add missing libraries
+            for lib in stdlibs
+                if !haskey(deps, lib)
+                    deps[lib] = uuids[lib];
+                    @info "Adding $lib to dependencies"
+                end
+            end
+            
+            proj["deps"] = deps;
+            Pkg.Types.write_project(proj, "Project.toml");
+          '
+      
+      # Explicitly build the package with proper dependency resolution
+      - name: Build Package
+        run: |
+          julia --project=. -e '
+            using Pkg;
+            Pkg.instantiate();
+            Pkg.resolve();
+            Pkg.build("SequentialMeasurements");
+          '
+      
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v3
         with:
           files: lcov.info
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false

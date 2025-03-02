@@ -1,6 +1,13 @@
 module SequentialMeasurements
 
 using Reexport
+# Import standard libraries that are used across the package
+using LinearAlgebra
+using Random
+using Statistics
+using Dates
+using Logging
+using FileIO
 
 # Load core types and modules in dependency order
 include("MeasurementAnalysis.jl")  # Renamed from OutputProcessing
