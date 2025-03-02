@@ -1,7 +1,9 @@
 using Test
 using QuantumOptics
 using SequentialMeasurements
-include("../scripts/error_virtualization.jl")
+using SequentialMeasurements.SpectralRepresentation: lf_gaussian
+using SequentialMeasurements.MeasurementAnalysis: process_fidelity_with_plus
+using SequentialMeasurements.QuantumProtocols: pure_dephasing_evolution
 
 @testset "Error Virtualization Tests" begin
     # Test initialization of parameters
@@ -92,7 +94,7 @@ include("../scripts/error_virtualization.jl")
             control,
             tempdir(),  # Use temporary directory for testing
             measurement_scheme,
-            error_virtualization_realization;
+            pure_dephasing_evolution;  # Using the function from QuantumProtocols module
             save_output=false
         )
         
