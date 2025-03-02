@@ -169,5 +169,8 @@ function run_simulation(
 
     return final_results
 end
+# TODO: consider an kwarg for verbose output and include more logging information
+# like total running time and maybe a progress bar.
+
 
 end # module SimulationExecution
