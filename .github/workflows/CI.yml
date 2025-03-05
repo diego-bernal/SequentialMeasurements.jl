@@ -32,7 +32,7 @@ jobs:
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: julia-actions/cache@v1
+      - uses: julia-actions/cache@v2
       
       # No need to explicitly add standard libraries like LinearAlgebra, Random, etc.
       # as they are already part of the Julia standard library
