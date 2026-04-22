@@ -1,5 +1,4 @@
 # Script that runs the error virtualization protocol simulation
-using QuantumOptics
 using SequentialMeasurements
 using .SpectralRepresentation: lf_gaussian
 using .MeasurementAnalysis: process_fidelity_with_plus
@@ -11,6 +10,12 @@ ctrl_params_dict = Dict(
     :nsteps => 10,    # number of time steps per free evolution region
     :M_max => 60      # number of control cycles
 )
+# it should be possible to consider repetition of the control sequences without reset
+# here there are M_max control cycles and after each the system is reset to the initial state
+
+# also, the initialization of the operators Initialization.jl assumes a specific initial 
+# states for system and bath, it is better to have the initial state of the system as a
+# an input parameter
 
 noise_params_dict = Dict(
     :Nb => 0,                             # number of bath qubits
@@ -24,6 +29,10 @@ measurement_scheme_dict = Dict(
     :fout => process_fidelity_with_plus,  # From MeasurementAnalysis module
     :conditional_evolution => false
 )
+
+# for the measurement scheme, would it be better to handle it in a different way?
+# or alternatively, to change the way the noise is handled, so that it doesn't depend on 
+# a dictionary entry :lf_gaussian, but rather on a function handle which would give more flexibility
 
 num_realizations = Int(1e1)
 save_output = false
