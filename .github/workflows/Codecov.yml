@@ -22,7 +22,7 @@ jobs:
       - uses: julia-actions/julia-processcoverage@v1
         with:
           directories: src
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v5
         with:
           file: ./lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}  # Optional, needed if repo is private
